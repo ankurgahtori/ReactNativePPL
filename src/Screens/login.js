@@ -21,10 +21,10 @@ const LoginScreen = ({navigation}) => {
     };
     console.log(obj, serverURL);
     Axios.post(serverURL + '/user/loginUser', obj)
-      .then((result) => {
+      .then(result => {
         if (result) {
           Axios.post(serverURL + '/user/verifyUserToken', result.data).then(
-            (result) => {
+            result => {
               if (result.data.verify) {
                 alert('user Found');
                 let email = result.data.email;
@@ -35,7 +35,7 @@ const LoginScreen = ({navigation}) => {
           );
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('here error comming', err);
       });
   };
@@ -53,7 +53,7 @@ const LoginScreen = ({navigation}) => {
           onFocus={handleFocus}
           onBlur={handleBlur}
           underlineColorAndroid={isFocused ? '#c25a0f' : '#c4c3cb'}
-          onChangeText={(Text) => {
+          onChangeText={Text => {
             setEmail(Text);
           }}
         />
@@ -65,7 +65,7 @@ const LoginScreen = ({navigation}) => {
           onFocus={handleFocus}
           onBlur={handleBlur}
           underlineColorAndroid={isFocused ? '#c25a0f' : '#c4c3cb'}
-          onChangeText={(Text) => {
+          onChangeText={Text => {
             setPassword(Text);
           }}
         />

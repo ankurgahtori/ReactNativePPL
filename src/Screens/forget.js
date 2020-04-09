@@ -3,6 +3,7 @@ import {Text, View, TextInput, Image} from 'react-native';
 import {Button} from 'react-native-elements';
 import {serverURL} from '../../config/config';
 import styles from './style';
+import Axios from 'axios';
 
 const ForgetScreen = ({navigation}) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -17,7 +18,9 @@ const ForgetScreen = ({navigation}) => {
     let obj = {
       email: email,
     };
-    console.log('raghvendra tiwari', obj);
+    Axios.post(serverURL + '/user/resetPassword', obj).then(() => {
+      alert('link sent to your registered Email address');
+    });
   };
   return (
     <View style={styles.loginScreenContainer}>
@@ -33,7 +36,7 @@ const ForgetScreen = ({navigation}) => {
           onFocus={handleFocus}
           onBlur={handleBlur}
           underlineColorAndroid={isFocused ? '#c25a0f' : '#c4c3cb'}
-          onChangeText={(Text) => {
+          onChangeText={Text => {
             setEmail(Text);
           }}
         />

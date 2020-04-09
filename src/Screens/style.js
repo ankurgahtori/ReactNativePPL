@@ -57,5 +57,11 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     textDecorationLine: 'underline',
   },
+  splashScreen: {flex: 1, justifyContent: 'center'},
+  verifyScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 export default styles;
