@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Text, View} from 'react-native';
-import SplashScreen from './splash';
-import {serverURL} from '../../config/config';
+import SplashScreen from '../splash';
+import {serverURL} from '../../../config/config';
 import Axios from 'axios';
 import styles from './style';
 

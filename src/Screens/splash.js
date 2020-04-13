@@ -1,6 +1,6 @@
 import React from 'react';
 import {ActivityIndicator, View} from 'react-native';
-import styles from './style';
+import styles from './signoutscreens/style';
 
 const SplashScreen = () => {
   return (

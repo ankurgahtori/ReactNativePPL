@@ -1,17 +1,21 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useContext} from 'react';
 import 'react-native-gesture-handler';
-import {NavigationContainer, useLinking} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {Platform, Text, Linking} from 'react-native';
-import LoginScreen from './src/Screens/login';
-import SignupScreen from './src/Screens/signup';
-import ForgetScreen from './src/Screens/forget';
-import VerifyScreen from './src/Screens/verify';
-const Stack = createStackNavigator();
+import {
+  NavigationContainer,
+  useLinking,
+  useTheme,
+} from '@react-navigation/native';
+import SignOutScreens from './src/Screens/signoutscreens/index';
+import AsyncStorage from 'react-native';
+import SignInScreens from './src/Screens/signinscreens/index';
+import SplashScreen from './src/Screens/splash';
+import AuthContext from './src/AuthContext';
+import serverURL from './config/config';
 const App = () => {
+  const [isReady, setIsReady] = React.useState(false);
+  const [initialState, setInitialState] = React.useState();
   const ref = React.useRef();
-
-  const demo = useLinking(ref, {
+  const {getInitialState} = useLinking(ref, {
     prefixes: ['ppl://user'],
     config: {
       verify: {
@@ -22,14 +26,7 @@ const App = () => {
       },
     },
   });
-  const {getInitialState} = demo;
-  const [isReady, setIsReady] = React.useState(false);
-  const [initialState, setInitialState] = React.useState();
-  useEffect(() => {
-    if (initialState) {
-      console.log(initialState, '11111111');
-    }
-  }, [initialState]);
+
   React.useEffect(() => {
     getInitialState()
       .catch(e => {
@@ -42,70 +39,75 @@ const App = () => {
         setIsReady(true);
       });
   }, [getInitialState]);
+  const [state, dispatch] = React.useReducer(
+    (prevState, action) => {
+      switch (action.type) {
+        case 'RESTORE_TOKEN':
+          return {
+            ...prevState,
+            userToken: action.token,
+            isAuthenticating: false,
+          };
+        case 'SIGN_IN':
+          return {
+            ...prevState,
+            isSignout: false,
+            userToken: action.token,
+          };
+        case 'SIGN_OUT':
+          return {
+            ...prevState,
+            isSignout: true,
+            userToken: null,
+          };
+      }
+    },
+    {
+      isAuthenticating: true,
+      isSignout: false,
+      userToken: null,
+    },
+  );
 
-  if (!isReady) {
-    return null;
+  React.useEffect(() => {
+    const bootstrapAsync = async () => {
+      let userToken;
+      try {
+        userToken = await AsyncStorage.getItem('userToken');
+      } catch (e) {
+        console.log('Restoring token failed', userToken);
+      }
+      if (userToken)
+        Axios.post(serverURL + '/user/verifyUserToken', userToken).then(
+          result => {
+            if (result.data) {
+              dispatch({type: 'RESTORE_TOKEN', token: userToken});
+            } else {
+              dispatch({type: 'RESTORE_TOKEN', token: null});
+            }
+          },
+        );
+    };
+    bootstrapAsync();
+  }, []);
+  const authContext = React.useMemo(() => {
+    return {
+      signIn: async data => {
+        dispatch({type: 'SIGN_IN', token: data});
+      },
+      signOut: () => dispatch({type: 'SIGN_OUT'}),
+    };
+  }, []);
+  if (!isReady && !state.isAuthenticating) {
+    return <SplashScreen />;
   }
-  // const handleUrl = url => {
-  //   if (url) {
-  //     let id = url.split('verify/');
-  //     console.log(id);
-  //   }
-  // };
-  // useEffect(() => {
-  //   if (Platform.OS === 'android') {
-  //     Linking.getInitialURL()
-  //       .then(url => {
-  //         handleUrl(url);
-  //       })
-  //       .catch(err => {
-  //         console.log(err, 'error');
-  //       });
-  //     Linking.addEventListener('url', ({url}) => {
-  //       handleUrl(url);
-  //     }); //add on mount
-  //   }
-  //   return () => {
-  //     Linking.removeEventListener('url'); //remove on unmount
-  //   };
-  // }, []);
 
   return (
-    <NavigationContainer initialState={initialState} ref={ref}>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#f58c20',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-          headerTitleAlign: 'center',
-          headerLeft: null,
-        }}>
-        <Stack.Screen
-          name="login"
-          component={LoginScreen}
-          options={{title: 'Login Page'}}
-        />
-        <Stack.Screen
-          name="signup"
-          component={SignupScreen}
-          options={{title: 'Signup Page'}}
-        />
-        <Stack.Screen
-          name="forget"
-          component={ForgetScreen}
-          options={{title: 'Forget Page'}}
-        />
-        <Stack.Screen
-          name="verify"
-          component={VerifyScreen}
-          options={{title: 'Verifying Your Accout ...'}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthContext.Provider value={authContext}>
+      <NavigationContainer initialState={initialState} ref={ref}>
+        {state.userToken ? <SignInScreens /> : <SignOutScreens />}
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 };
 export default App;

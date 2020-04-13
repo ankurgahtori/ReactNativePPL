@@ -3,7 +3,8 @@ import {Text, View, TextInput, Image, TouchableOpacity} from 'react-native';
 import {Button} from 'react-native-elements';
 import styles from './style';
 import Axios from 'axios';
-import {serverURL} from '../../config/config';
+import {serverURL} from '../../../config/config';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const SignupScreen = ({navigation}) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -34,11 +35,11 @@ const SignupScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   return (
-    <View style={styles.loginScreenContainer}>
+    <ScrollView style={styles.loginScreenContainer}>
       <View style={styles.loginFormView}>
         <Image
           style={styles.logoIcon}
-          source={require('../../assets/logo.png')}
+          source={require('../../../assets/logo.png')}
         />
         <TextInput
           placeholder="Username"
@@ -125,7 +126,7 @@ const SignupScreen = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
