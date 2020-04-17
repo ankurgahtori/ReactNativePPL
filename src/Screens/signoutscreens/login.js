@@ -5,11 +5,10 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-  AsyncStorage,
   Modal,
-  Alert,
   Dimensions,
 } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {Button} from 'react-native-elements';
 import {serverURL} from '../../../config/config';
 import styles from './style';
@@ -44,7 +43,6 @@ const LoginScreen = ({navigation}) => {
       password: password,
       email: email,
     };
-    console.log(obj, serverURL);
     Axios.post(serverURL + '/user/loginUser', obj)
       .then(result => {
         if (result) {
@@ -53,8 +51,21 @@ const LoginScreen = ({navigation}) => {
             result => {
               if (result.data) {
                 if (result.data.isVerified) {
+                  AsyncStorage.setItem(
+                    'userInfo',
+                    JSON.stringify(result.data),
+                    err => {
+                      console.log(err);
+                    },
+                  );
+                  AsyncStorage.setItem(
+                    'userToken',
+                    JSON.stringify(userToken.token),
+                    err => {
+                      console.log(err);
+                    },
+                  );
                   signIn(userToken);
-                  // navigation.navigate('homepage');
                 } else {
                   alert('Your account is not verified');
                 }
@@ -80,7 +91,6 @@ const LoginScreen = ({navigation}) => {
         }}>
         <View
           style={{
-            position: 'absolute',
             width: '100%',
             height: '100%',
             justifyContent: 'center',
