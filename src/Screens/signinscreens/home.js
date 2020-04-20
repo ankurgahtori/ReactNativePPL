@@ -9,7 +9,7 @@ import SplashScreen from '../splash';
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [limit, setLimit] = useState(1);
+  const [limit, setLimit] = useState(5);
   const [skip, setSkip] = useState(0);
   const [postLeft, setPostsLeft] = useState(true);
   const getPosts = () => {
@@ -42,7 +42,7 @@ const HomeScreen = () => {
     return <SplashScreen />;
   }
   return (
-    <View>
+    <View style={{backgroundColor: 'white'}}>
       <FlatList
         onEndReached={() => {
           if (postLeft) {
@@ -69,6 +69,11 @@ const HomeScreen = () => {
         }
         renderItem={post => {
           return <SinglePost data={post} key={post._id} />;
+        }}
+        onRefresh={() => {
+          Axios.post(serverURL + '/getNewPosts', {date: post.date}).then((result)=>{
+            
+          });
         }}
       />
     </View>

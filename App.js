@@ -1,13 +1,13 @@
-import React, {useEffect, useContext} from 'react';
+import React from 'react';
 import 'react-native-gesture-handler';
 import {NavigationContainer, useLinking} from '@react-navigation/native';
 import SignOutScreens from './src/Screens/signoutscreens/index';
 import AsyncStorage from '@react-native-community/async-storage';
 import SignInScreens from './src/Screens/signinscreens/index';
-import SplashScreen from './src/Screens/splash';
 import AuthContext from './src/AuthContext';
 import {serverURL} from './config/config';
 import Axios from 'axios';
+import SplashScreen from 'react-native-splash-screen';
 const App = () => {
   const [isDeepLinkingReady, setIsDeepLinkingReady] = React.useState(false);
   const [initialState, setInitialState] = React.useState();
@@ -23,7 +23,6 @@ const App = () => {
       },
     },
   });
-
   React.useEffect(() => {
     getInitialState()
       .catch(e => {
@@ -87,6 +86,8 @@ const App = () => {
             .catch(err => {
               console.log('Erro', err);
             });
+        } else {
+          dispatch({type: 'RESTORE_TOKEN', token: null});
         }
       } catch (e) {
         console.log('Restoring token failed', e);
@@ -99,19 +100,22 @@ const App = () => {
       signIn: async data => {
         dispatch({type: 'SIGN_IN', token: data.token});
       },
-      signOut: () => dispatch({type: 'SIGN_OUT'}),
+      signOut: async () => {
+        dispatch({type: 'SIGN_OUT'});
+        AsyncStorage.removeItem('userToken');
+        AsyncStorage.removeItem('userInfo');
+      },
     };
   }, []);
-  if (state.isAuthenticating || !isDeepLinkingReady) {
-    return <SplashScreen />;
-  } else {
-    return (
-      <AuthContext.Provider value={authContext}>
-        <NavigationContainer initialState={initialState} ref={ref}>
-          {state.userToken ? <SignInScreens /> : <SignOutScreens />}
-        </NavigationContainer>
-      </AuthContext.Provider>
-    );
+  if (!state.isAuthenticating || isDeepLinkingReady) {
+    SplashScreen.hide();
   }
+  return (
+    <AuthContext.Provider value={authContext}>
+      <NavigationContainer initialState={initialState} ref={ref}>
+        {state.userToken ? <SignInScreens /> : <SignOutScreens />}
+      </NavigationContainer>
+    </AuthContext.Provider>
+  );
 };
 export default App;

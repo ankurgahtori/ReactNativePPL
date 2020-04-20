@@ -1,36 +1,21 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  AsyncStorage,
-  PermissionsAndroid,
-} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, Image, Picker} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import axios from 'axios';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {serverURL} from '../../../config/config';
 import {ActivityIndicator} from 'react-native-paper';
-
-const UploadScreen = () => {
+import AsyncStorage from '@react-native-community/async-storage';
+const UploadScreen = props => {
   const [userInfo, setUserInfo] = useState();
-  AsyncStorage.getItem('userInfo', (err, userInfo) => {
-    setUserInfo(JSON.parse(userInfo));
-  });
-
+  console.log(props);
   const title = 'some random title';
   const [isUploading, setIsLoading] = useState(true);
   const [avatarSource, setAvatarSource] = useState(null);
   const [image, setImage] = useState();
   const postPicker = () => {
     const options = {
-      // noData: true,
-      // title: 'Select Avatar',
-      // customButtons: [{name: 'fb', title: 'Choose Photo from Facebook'}],
-      // storageOptions: {
-      // skipBackup: true,
-      //   path: 'images',
-      // },
+      noData: true,
     };
     ImagePicker.showImagePicker(options, response => {
       if (response.didCancel) {
@@ -50,7 +35,7 @@ const UploadScreen = () => {
   const createFormData = (photo = image) => {
     let data = new FormData();
     let imageData = {
-      filename: photo.fileName,
+      name: photo.fileName,
       type: photo.type,
       uri: photo.uri,
     };
@@ -58,35 +43,27 @@ const UploadScreen = () => {
     data.append('postedBy', userInfo._id);
     return data;
   };
-  // const checkPermission = async () => {
-  //   const granted = await PermissionsAndroid.request(
-  //     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-  //     {
-  //       title: 'AndoridPermissionExample App Camera Permission',
-  //       message: 'AndoridPermissionExample App needs access to your camera ',
-  //     },
-  //   );
-  //   if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //     alert('permission granted');
-  //   } else {
-  //     alert('CAMERA Permission Denied.');
-  //   }
-  // };
   const handleUploadPhoto = () => {
     let data = createFormData(image);
-    console.log('sending datan : ', data);
     axios
       .post(serverURL + '/post/create', data)
       .then(result => {
         if (result.data) {
-          console.log(result.data);
           alert('upload sucessfull');
         }
       })
       .catch(err => {
-        console.warn(err);
+        console.warn(err, 'error');
       });
   };
+  useEffect(() => {
+    AsyncStorage.getItem('userInfo', (err, userInfo) => {
+      setUserInfo(JSON.parse(userInfo));
+    });
+  }, []);
+  if (!userInfo) {
+    return <ActivityIndicator size="large" />;
+  }
   return (
     <View style={{flex: 1, justifyContent: 'flex-end'}}>
       <Image source={avatarSource} style={{flex: 1}} />

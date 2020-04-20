@@ -1,22 +1,15 @@
 import React, {useState, useEffect, useRef, createRef} from 'react';
-import {
-  View,
-  Image,
-  Dimensions,
-  Animated,
-  ListItem,
-  Text,
-  StyleSheet,
-} from 'react-native';
+import {View, Image, Dimensions, Text, StyleSheet} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import SplashScreen from '../splash';
 import {serverURL} from '../../../config/config';
 import AsyncStorage from '@react-native-community/async-storage';
 import {TextInput} from 'react-native-paper';
 import Axios from 'axios';
+import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 const SinglePost = ({data}) => {
   let height = Dimensions.get('screen').height;
-  let width = Dimensions.get('screen').width;
   const [isReady, setIsReady] = useState(false);
   const [post, setPost] = useState(data.item);
   const [comments, setComments] = useState(post.comments);
@@ -48,26 +41,26 @@ const SinglePost = ({data}) => {
     <>
       {isReady ? (
         <View style={styles.container}>
-          {/* container */}
-          {/* header */}
           <View style={styles.header}>
             <Image
               source={{uri: serverURL + '/profile/' + post.postedBy.image}}
               style={styles.profilePic}
             />
             <Text style={styles.prfileText}>{post.postedBy.username}</Text>
+            <View style={{alignSelf: 'flex-end', flex: 1}}>
+              <Text style={{alignSelf: 'flex-end'}}>
+                {moment(post.date)
+                  .startOf('hour')
+                  .fromNow()}
+              </Text>
+            </View>
           </View>
-          {/* header */}
-          {/* image */}
           <View>
             <Image
               source={{uri: serverURL + '/post/' + post.image}}
               style={{height: height / 2, width: '100%'}}
             />
           </View>
-          {/* image */}
-          {/* bottom */}
-
           <View style={{backgroundColor: 'white'}}>
             <View
               style={{
@@ -88,12 +81,11 @@ const SinglePost = ({data}) => {
                     }
                   });
                 }}>
-                <Image
-                  source={require('../../../assets/like.png')}
-                  style={{
-                    tintColor: ispostLiked ? 'red' : null,
-                  }}
-                />
+                {ispostLiked ? (
+                  <Icon name="heart" color="tomato" size={40} />
+                ) : (
+                  <Icon name="heart-outline" size={40} />
+                )}
               </TouchableOpacity>
               <Text style={styles.likeCount}>{post.like.length}</Text>
               <TouchableOpacity>
@@ -105,6 +97,17 @@ const SinglePost = ({data}) => {
               <Text style={styles.commentCountText}>
                 {post.comments.length}
               </Text>
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    marginHorizontal: 5,
+                    alignSelf: 'center',
+                    fontSize: 30,
+                    alignSelf: 'flex-end',
+                  }}>
+                  {post.category.categoryName.toUpperCase()}
+                </Text>
+              </View>
             </View>
             <View style={styles.postTitleContainer}>
               <Text style={{fontWeight: 'bold', fontSize: 20}}>
@@ -151,7 +154,6 @@ const SinglePost = ({data}) => {
                   <View
                     key={value._id}
                     style={{
-                      // flexDirection: 'row',
                       width: '90%',
                       paddingHorizontal: '5%',
                     }}>
@@ -218,7 +220,7 @@ const SinglePost = ({data}) => {
   );
 };
 const styles = StyleSheet.create({
-  container: {flex: 1},
+  container: {flex: 1, marginBottom: 20},
   header: {
     flexDirection: 'row',
     backgroundColor: 'white',
