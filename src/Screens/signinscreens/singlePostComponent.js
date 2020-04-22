@@ -7,6 +7,7 @@ import {TextInput} from 'react-native-paper';
 import Axios from 'axios';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import VideoComponent from './videoComponent';
 
 const SinglePost = ({data}) => {
   let height = Dimensions.get('screen').height;
@@ -56,10 +57,17 @@ const SinglePost = ({data}) => {
             </View>
           </View>
           <View>
-            <Image
-              source={{uri: serverURL + '/post/' + post.image}}
-              style={{height: height / 2, width: '100%'}}
-            />
+            {post.image.endsWith('mp4') ||
+            post.image.endsWith('3gp') ||
+            post.image.endsWith('webm') ||
+            post.image.endsWith('mkv') ? (
+              <VideoComponent post={post} />
+            ) : (
+              <Image
+                source={{uri: serverURL + '/post/' + post.image}}
+                style={{height: height / 2, width: '100%'}}
+              />
+            )}
           </View>
           <View style={{backgroundColor: 'white'}}>
             <View
@@ -97,12 +105,16 @@ const SinglePost = ({data}) => {
               <Text style={styles.commentCountText}>
                 {post.comments.length}
               </Text>
+              <TouchableOpacity>
+                <Icon name="phone" size={30} />
+                <Text style={{alignSelf: 'center'}}>Contact Owner</Text>
+              </TouchableOpacity>
               <View style={{flex: 1}}>
                 <Text
                   style={{
                     marginHorizontal: 5,
                     alignSelf: 'center',
-                    fontSize: 30,
+                    fontSize: 20,
                     alignSelf: 'flex-end',
                   }}>
                   {post.category.categoryName.toUpperCase()}

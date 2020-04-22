@@ -8,6 +8,7 @@ import AuthContext from './src/AuthContext';
 import {serverURL} from './config/config';
 import Axios from 'axios';
 import SplashScreen from 'react-native-splash-screen';
+import {ActivityIndicator} from 'react-native-paper';
 const App = () => {
   const [isDeepLinkingReady, setIsDeepLinkingReady] = React.useState(false);
   const [initialState, setInitialState] = React.useState();
@@ -107,7 +108,9 @@ const App = () => {
       },
     };
   }, []);
-  if (!state.isAuthenticating || isDeepLinkingReady) {
+  if (state.isAuthenticating || !isDeepLinkingReady) {
+    return null;
+  } else {
     SplashScreen.hide();
   }
   return (

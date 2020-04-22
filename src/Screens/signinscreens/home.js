@@ -1,7 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  FlatList,
+} from 'react-native';
 import SinglePost from './singlePostComponent';
-import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import Axios from 'axios';
 import {serverURL} from '../../../config/config';
 import SplashScreen from '../splash';
@@ -9,7 +14,8 @@ import SplashScreen from '../splash';
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [limit, setLimit] = useState(5);
+  const [isRefresing, setIsRefresing] = useState(false);
+  const [limit, setLimit] = useState(2);
   const [skip, setSkip] = useState(0);
   const [postLeft, setPostsLeft] = useState(true);
   const getPosts = () => {
@@ -18,7 +24,7 @@ const HomeScreen = () => {
         skip: skip,
         limit: limit,
         sort: 'date',
-        order: 1,
+        order: -1,
         category: 'Fake_ID',
       },
     })
@@ -33,6 +39,22 @@ const HomeScreen = () => {
       })
       .catch(err => {
         console.log('err', err);
+      });
+  };
+  getNewPost = () => {
+    console.log('call reached ', {date: posts[0].date});
+    Axios.post(serverURL + '/post/getNewPosts', {date: posts[0].date})
+      .then(result => {
+        if (result.data) {
+          console.log(result.data);
+          setPosts([...result.data, ...posts]);
+          setSkip(skip + result.data.length);
+        }
+        setIsRefresing(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setIsRefresing(false);
       });
   };
   useEffect(() => {
@@ -71,10 +93,10 @@ const HomeScreen = () => {
           return <SinglePost data={post} key={post._id} />;
         }}
         onRefresh={() => {
-          Axios.post(serverURL + '/getNewPosts', {date: post.date}).then((result)=>{
-            
-          });
+          setIsRefresing(true);
+          getNewPost();
         }}
+        refreshing={isRefresing}
       />
     </View>
   );

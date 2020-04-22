@@ -4,7 +4,6 @@ import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeScreen from './home';
 import UploadScreen from './uploadPost';
 import ProfileScreen from './profile';
-
 const Tab = createBottomTabNavigator();
 
 const SignInScreens = () => {
