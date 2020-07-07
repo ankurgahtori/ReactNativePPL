@@ -5,6 +5,7 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Modal,
   Dimensions,
 } from 'react-native';
@@ -13,8 +14,9 @@ import {Button} from 'react-native-elements';
 import {serverURL} from '../../../config/config';
 import styles from './style';
 import Axios from 'axios';
-import {ScrollView} from 'react-native-gesture-handler';
+import {ScrollView, TouchableHighlight} from 'react-native-gesture-handler';
 import AuthContext from '../../AuthContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 const LoginScreen = ({navigation}) => {
   const {signIn} = useContext(AuthContext);
@@ -25,6 +27,7 @@ const LoginScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [loginButtonReady, setLoginButtonReady] = useState(false);
+  const [Color_bg, setColor] = useState(false);
   useEffect(() => {
     if (email && password) {
       setLoginButtonReady(true);
@@ -202,11 +205,13 @@ const LoginScreen = ({navigation}) => {
           {' '}
           I do not have any account yet.tiwai
         </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#DDDDDD',
-          }}
-          onPress={() => navigation.navigate('signup')}>
+        <TouchableWithoutFeedback
+          onPressIn={() => setColor(true)}
+          onPressOut={() => setColor(false)}
+          onPress={() => {
+            navigation.navigate('signup')}}>
+          <View>
+            {/* <View style={{backgroundColor: Color_bg ? 'green' : 'red'}}>
           <Text
             style={{
               color: '#1076ea',
@@ -215,8 +220,44 @@ const LoginScreen = ({navigation}) => {
               alignSelf: 'center',
             }}>
             Create My Account Now !
-          </Text>
-        </TouchableOpacity>
+          </Text></View> */}
+            <LinearGradient
+              colors={
+                Color_bg
+                  ? ['#4c669f', '#3b5998', '#192f6a']
+                  : ['#4c109f', '#2b5908', '#111f6a']
+              }
+              style={{
+                flex: 1,
+                paddingLeft: 15,
+                paddingRight: 15,
+                borderRadius: 5,
+              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontFamily: 'Gill Sans',
+                  textAlign: 'center',
+                  margin: 10,
+                  color: '#ffffff',
+                  backgroundColor: 'transparent',
+                }}>
+                Sign in with Facebook
+              </Text>
+            </LinearGradient>
+            <Text
+              style={{
+                fontSize: 18,
+                fontFamily: 'Gill Sans',
+                textAlign: 'center',
+                margin: 10,
+                color: '#ffffff',
+                backgroundColor: 'red',
+              }}>
+              Sign in with Facebook FacebookFacebook
+            </Text>
+          </View>
+        </TouchableWithoutFeedback>
       </View>
     </ScrollView>
   );

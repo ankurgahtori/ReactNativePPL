@@ -1,9 +1,11 @@
 import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import HomeScreen from './home';
 import UploadScreen from './uploadPost';
 import ProfileScreen from './profile';
+import MyTabBar from './MyTabBar';
 const Tab = createBottomTabNavigator();
 
 const SignInScreens = () => {
@@ -23,13 +25,16 @@ const SignInScreens = () => {
           return <Ionicons name={iconName} size={30} color={color} />;
         },
       })}
-      tabBarOptions={{
-        activeTintColor: 'tomato',
-        inactiveTintColor: 'gray',
-      }}>
+      // tabBarOptions={{
+      //   activeTintColor: 'tomato',
+      //   inactiveTintColor: 'gray',
+      // }}
+      tabBar={props => <MyTabBar {...props} />}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Upload" component={UploadScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile1" component={ProfileScreen} />
+      <Tab.Screen name="Profile2" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };

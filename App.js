@@ -116,7 +116,7 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer initialState={initialState} ref={ref}>
-        {state.userToken ? <SignInScreens /> : <SignOutScreens />}
+        {!state.userToken ? <SignInScreens /> : <SignOutScreens />}
       </NavigationContainer>
     </AuthContext.Provider>
   );
